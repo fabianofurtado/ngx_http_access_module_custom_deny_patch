@@ -25,6 +25,7 @@ Currently, the patch supports:
 
 - `403` (`NGX_HTTP_FORBIDDEN`)
 - `404` (`NGX_HTTP_NOT_FOUND`)
+- `405` (`NGX_HTTP_NOT_ALLOWED`)
 
 Support for additional status codes can be added easily.
 

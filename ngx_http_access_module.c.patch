@@ -1,5 +1,5 @@
---- src/http/modules/ngx_http_access_module.c	2025-08-28 17:57:50.834471675 -0300
-+++ src/http/modules/ngx_http_access_module_new.c	2025-08-28 17:59:06.755196819 -0300
+--- src/http/modules/ngx_http_access_module.c	2025-09-16 20:57:19.796946667 -0300
++++ src/http/modules/ngx_http_access_module_new.c	2025-09-16 21:10:45.008682211 -0300
 @@ -14,6 +14,7 @@
      in_addr_t         mask;
      in_addr_t         addr;
@@ -122,15 +122,16 @@
      if (value[1].len == 3 && ngx_strcmp(value[1].data, "all") == 0) {
          all = 1;
  
-@@ -337,6 +350,18 @@
+@@ -337,6 +350,19 @@
          }
      }
  
 +    if (deny && cf->args->nelts == 3) {
 +        deny_status_code = ngx_atoi(value[2].data, value[2].len);
-+        if (deny_status_code == NGX_ERROR || (
-+                   deny_status_code != NGX_HTTP_FORBIDDEN &&
-+                   deny_status_code != NGX_HTTP_NOT_FOUND)) {
++        if (deny_status_code == NGX_ERROR || !(
++                   deny_status_code == NGX_HTTP_FORBIDDEN ||
++                   deny_status_code == NGX_HTTP_NOT_FOUND ||
++                   deny_status_code == NGX_HTTP_NOT_ALLOWED)) {
 +            ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
 +                "invalid \"%V\" response status code \"%V\"",
 +                &value[0], &value[2]);
@@ -141,7 +142,7 @@
      if (cidr.family == AF_INET || all) {
  
          if (alcf->rules == NULL) {
-@@ -354,7 +379,8 @@
+@@ -354,7 +380,8 @@
  
          rule->mask = cidr.u.in.mask;
          rule->addr = cidr.u.in.addr;
@@ -151,7 +152,7 @@
      }
  
  #if (NGX_HAVE_INET6)
-@@ -375,7 +401,8 @@
+@@ -375,7 +402,8 @@
  
          rule6->mask = cidr.u.in6.mask;
          rule6->addr = cidr.u.in6.addr;
@@ -161,7 +162,7 @@
      }
  #endif
  
-@@ -395,7 +422,8 @@
+@@ -395,7 +423,8 @@
              return NGX_CONF_ERROR;
          }
  
